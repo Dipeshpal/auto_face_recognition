@@ -45,7 +45,10 @@ After installing the library you can import the module-
 
 4. **Predict Faces-**
 
+	    # Real Time
 	    obj.predict_faces()
+	    # Single Face Recofnition
+	    obj.predict_face()
 
 **Parameters You Can Choose-**
 
@@ -100,6 +103,26 @@ face_recognition_train
 	 :param color_mode: bool (example: False)  
 	 :return: None  
 	 """
+
+predict_face
+	
+
+    predict_face(self, class_name=None, img_height=128, img_width=128,  
+                     haarcascade_path='haarcascade/haarcascade_frontalface_default.xml',  
+                     eyecascade_path='haarcascade/haarcascade_eye.xml', model_path='model',  
+                     color_mode=False, image_path='tmp.png'):  
+      """  
+      Predict Face  
+     :param class_name: Type-List (example: ['class1', 'class2'] )  
+     :param img_height: int (example:128)  
+     :param img_width: int (example:128)  
+     :param haarcascade_path: str (example: 'haarcascade_frontalface_default.xml)  
+     :param eyecascade_path: str (example: 'haarcascade_eye.xml)  
+     :param model_path: str (example: 'model')  
+     :param color_mode: bool (example: False)  
+     :param image_path: str (example: 'src/image_predict.png'  
+     :return: None  
+     """
 
 ## 4. Future?
 
