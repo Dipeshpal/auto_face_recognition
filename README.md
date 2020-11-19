@@ -1,6 +1,7 @@
+
 # [auto_face_recognition](https://github.com/Dipeshpal/auto_face_recognition)
 
-***Last Upadted: 02 September, 2020***
+***Last Upadted: 19 November, 2020***
 
 1. What is auto_face_recognition?
  2. Prerequisite
@@ -13,6 +14,7 @@ It is a python library for the Face Recognition. This library make face recognit
 ## 2. Prerequisite-
 
 * To use it only Python (> 3.6) is required.
+* Recommended Python < 3.9
 
 ## 3. Getting Started (How to use it)-
  
@@ -73,8 +75,7 @@ datasetcreate
 	"""  
 face_recognition_train
 
-    face_recognition_train(data_dir='datasets', batch_size=32, img_height=128, img_width=128, epochs=10,  
-                               model_path='model'):  
+    face_recognition_train(data_dir='datasets', batch_size=32, img_height=128, img_width=128, epochs=10, model_path='model', pretrained=None, base_model_trainable=False):  
      """  
      Train TF Keras model according to dataset path  
      :param data_dir: str (example: 'folder_of_dataset')  
@@ -83,6 +84,8 @@ face_recognition_train
      :param img_width: int (example:128)  
      :param epochs: int (example:10)  
      :param model_path: str (example: 'model')  
+     :param pretrained: str (example: None, 'VGG16', 'ResNet50' or 'InceptionV3')
+     :param base_model_trainable: bool (example: False (Enable if you want to train the pretrained model's layer))
      :return: None  
      """
                    
