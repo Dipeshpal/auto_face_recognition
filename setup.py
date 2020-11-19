@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="auto_face_recognition",
-    version="0.0.1",
+    version="0.0.3",
     author="Dipesh",
     author_email="dipeshpal17@gmail.com",
     description="auto_face_recognition is Tensorflow based python library for fast face recognition",
@@ -16,7 +16,7 @@ setuptools.setup(
     url="https://github.com/Dipeshpal/auto_face_recognition",
     include_package_data=True,
     packages=find_namespace_packages(include=['auto_face_recognition.*', 'auto_face_recognition']),
-    install_requires=['opencv-contrib-python',
+    install_requires=['numpy==1.18.5', 'opencv-contrib-python',
                       'tensorflow', 'matplotlib'],
 
     classifiers=[

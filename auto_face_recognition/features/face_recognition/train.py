@@ -9,12 +9,15 @@ import tensorflow as tf
 
 from tensorflow import keras
 from tensorflow.keras import layers
+from tensorflow.keras.layers import GlobalAveragePooling2D, Dropout, Dense
 from tensorflow.keras.models import Sequential
+from tensorflow.keras.applications import ResNet50, InceptionV3, VGG16
+from tensorflow.keras import Model
 
 
 class Classifier:
     def __init__(self, data_dir='datasets', batch_size=32, img_height=128, img_width=128, epochs=10,
-                 model_path='model'):
+                 model_path='model', pretrained=False, base_model_trainable=False):
         self.data_dir = pathlib.Path(data_dir)
         self.image_count = len(list(glob.glob(data_dir + '/*/*.png')))
         self.batch_size = batch_size
@@ -27,6 +30,8 @@ class Classifier:
         self.epochs = epochs
         self.data_augmentation = None
         self.model_path = model_path
+        self.pretrained = pretrained
+        self.base_model_trainable = base_model_trainable
 
     def dataloader(self):
         train_ds = tf.keras.preprocessing.image_dataset_from_directory(
@@ -64,20 +69,46 @@ class Classifier:
 
     def model_create(self):
         self.data_augmentation_fun()
-        model = Sequential([
-            self.data_augmentation,
-            layers.experimental.preprocessing.Rescaling(1. / 255, input_shape=(self.img_height,
-                                                                               self.img_width, 3)),
-            layers.Conv2D(16, 3, padding='same', activation='relu'),
-            layers.MaxPooling2D(),
-            layers.Conv2D(32, 3, padding='same', activation='relu'),
-            layers.MaxPooling2D(),
-            layers.Conv2D(64, 3, padding='same', activation='relu'),
-            layers.MaxPooling2D(),
-            layers.Flatten(),
-            layers.Dense(128, activation='relu'),
-            layers.Dense(self.num_classes)
-        ])
+
+        if self.pretrained is not None:
+            if self.pretrained == 'VGG16':
+                base_model = VGG16(weights='imagenet', include_top=False,
+                                   input_shape=(self.img_height, self.img_width, 3))
+            elif self.pretrained == 'InceptionV3':
+                base_model = InceptionV3(weights='imagenet', include_top=False,
+                                         input_shape=(self.img_height, self.img_width, 3))
+            elif self.pretrained == 'ResNet50':
+                base_model = ResNet50(weights='imagenet', include_top=False,
+                                      input_shape=(self.img_height, self.img_width, 3))
+            else:
+                raise Exception(
+                    "Currently only support: ResNet50, InceptionV3, VGG16 or set 'pretrained=None' to use default model")
+
+            if not self.base_model_trainable:
+                base_model.trainable = False
+
+            model = Sequential()
+            model.add(base_model)
+            model.add(GlobalAveragePooling2D())
+            model.add(Dense(2048, activation='relu'))
+            model.add(Dense(1024, activation='relu'))
+            model.add(Dense(512, activation='relu'))
+            model.add(Dense(self.num_classes, activation='softmax'))
+        else:
+            model = Sequential([
+                self.data_augmentation,
+                layers.experimental.preprocessing.Rescaling(1. / 255, input_shape=(self.img_height,
+                                                                                   self.img_width, 3)),
+                layers.Conv2D(16, 3, padding='same', activation='relu'),
+                layers.MaxPooling2D(),
+                layers.Conv2D(32, 3, padding='same', activation='relu'),
+                layers.MaxPooling2D(),
+                layers.Conv2D(64, 3, padding='same', activation='relu'),
+                layers.MaxPooling2D(),
+                layers.Flatten(),
+                layers.Dense(128, activation='relu'),
+                layers.Dense(self.num_classes)
+            ])
 
         model.compile(optimizer='adam',
                       loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -129,6 +160,8 @@ class Classifier:
         print("img_height: ", self.img_height)
         print("class_names: ", self.class_names)
         print("Model Directory: ", self.model_path + '/model.h5')
+        print("Pretrained Model: ", self.pretrained)
+        print("base_model_trainable: ", self.base_model_trainable)
         print("================================================")
         print("================= Starting Training =================")
         model = self.model_create()
